@@ -1,0 +1,22 @@
+name: educay
+description: UK-focused adaptive study assistant for students, teachers, and parents
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.19.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  fl_chart: ^0.66.0
+  firebase_core: ^2.15.1
+  cloud_firestore: ^4.10.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
