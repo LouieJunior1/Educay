@@ -25,8 +25,10 @@ class TeacherDashboardScreen extends StatelessWidget {
             child: ListTile(
               title: Text(s.name),
               subtitle: Text(
-                'Status: ${s.performanceLabel}'
-                '${s.note.isNotEmpty ? '\nNote: ${s.note}' : ''}',
+               Status: ${s.homeworkScore > 80 ? "Excellent" : s.homeworkScore > 60 ? "Good" : "Needs Improvement"}
+                '${s.note != null && s.note!.isNotEmpty ? '\nNote: ${s.note}' : ''}',
+
+),
               ),
               trailing: IconButton(
                 icon: const Icon(Icons.edit),
