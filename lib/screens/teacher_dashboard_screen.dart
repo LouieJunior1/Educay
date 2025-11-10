@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../services/student_service.dart';
 import '../models/student.dart';
 
@@ -14,28 +15,24 @@ class TeacherDashboardScreen extends StatelessWidget {
     final students = studentService.students;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Teacher Dashboard')),
+      appBar: AppBar(
+        title: const Text('Teacher Dashboard'),
+      ),
       body: ListView.builder(
-        padding: const EdgeInsets.all(16),
         itemCount: students.length,
         itemBuilder: (context, i) {
-          final Student s = students[i];
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: ListTile(
-              title: Text(s.name),
-              subtitle: Text(
-               Status: ${s.homeworkScore > 80 ? "Excellent" : s.homeworkScore > 60 ? "Good" : "Needs Improvement"}
-                '${s.note != null && s.note!.isNotEmpty ? '\nNote: ${s.note}' : ''}',
-
-),
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () {
-                  _showUpdateDialog(context, s);
-                },
-              ),
+          final s = students[i];
+          return ListTile(
+            title: Text(s.name),
+            subtitle: Text(
+              'Status: ${s.homeworkScore > 80 ? "Excellent" : s.homeworkScore > 60 ? "Good" : "Needs Improvement"}'
+              '${s.note != null && s.note!.isNotEmpty ? '\nNote: ${s.note}' : ''}',
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                _showUpdateDialog(context, s, studentService);
+              },
             ),
           );
         },
@@ -43,52 +40,49 @@ class TeacherDashboardScreen extends StatelessWidget {
     );
   }
 
-  void _showUpdateDialog(BuildContext context, Student student) {
+  void _showUpdateDialog(
+    BuildContext context,
+    Student student,
+    StudentService studentService,
+  ) {
     final scoreController =
-        TextEditingController(text: student.homeworkScore.toStringAsFixed(0));
-    final noteController = TextEditingController(text: student.note);
+        TextEditingController(text: student.homeworkScore.toString());
+    final noteController = TextEditingController(text: student.note ?? '');
 
     showDialog(
       context: context,
-      builder: (_) {
+      builder: (ctx) {
         return AlertDialog(
           title: Text('Update ${student.name}'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: scoreController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Homework score (0-100)',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: noteController,
-                  decoration: const InputDecoration(
-                    labelText: 'In-class note',
-                  ),
-                  maxLines: 2,
-                ),
-              ],
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: scoreController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration:
+                    const InputDecoration(labelText: 'Homework Score'),
+              ),
+              TextField(
+                controller: noteController,
+                decoration: const InputDecoration(labelText: 'In-class Note'),
+              ),
+            ],
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.of(ctx).pop(),
               child: const Text('Cancel'),
             ),
-            ElevatedButton(
+            TextButton(
               onPressed: () {
-                final newScore = double.tryParse(scoreController.text) ?? 0;
-                context
-                    .read<StudentService>()
-                    .updateHomework(student.id, newScore);
-                context
-                    .read<StudentService>()
-                    .updateNote(student.id, noteController.text.trim());
-                Navigator.pop(context);
+                final newScore = double.tryParse(scoreController.text);
+                if (newScore != null) {
+                  studentService.updateHomework(student.id, newScore);
+                }
+                studentService.updateNote(student.id, noteController.text);
+                Navigator.of(ctx).pop();
               },
               child: const Text('Save'),
             ),
