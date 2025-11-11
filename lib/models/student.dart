@@ -1,4 +1,6 @@
- class Student {
+ // lib/models/student.dart
+
+class Student {
   final String id;
   final String name;
   final double homeworkScore;
@@ -25,3 +27,4 @@
     );
   }
 }
+
